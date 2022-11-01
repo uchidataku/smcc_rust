@@ -1,21 +1,42 @@
+use std::ptr::null;
+use nannou::prelude::*;
+
+static RADIUS: f32 = 25.0;
+
 fn main() {
-    reduction("4/6");
+    nannou::app(model)
+        .size(100, 100)
+        .update(update)
+        .simple_window(view)
+        .run();
 }
 
-fn reduction(arg: &str) {
-    let v: Vec<&str> = arg.split('/').collect();
-    let a: u32 = v[0].parse().unwrap();
-    let b: u32 = v[1].parse().unwrap();
-    let greatest_common_divisor: u32 = gcd(a,b);
-    let numerator = 4 / greatest_common_divisor;
-    let denominator = 6 / greatest_common_divisor;
-    println!("{}/{}", numerator, denominator);
+struct Model {}
+
+fn model(_app: &App) -> Model {
+    Model {}
 }
 
-fn gcd(num_1: u32, num_2: u32) -> u32 {
-    if num_2 == 0 {
-        num_1
-    } else {
-        gcd(num_2, num_1 % num_2)
+fn update(_app: &App, _model: &mut Model, _update: Update) {
+}
+
+fn view(app: &App, _model: &Model, frame: Frame){
+    let draw = app.draw();
+    draw.background().color(WHITE);
+    let boundary = app.window_rect();
+    for y in -25..=25 {
+        for x in -25..=25 {
+            let dx = x as f32 - 0.0;
+            let dy = y as f32 - 0.0;
+            let dist = (dx.powf(2.0) + dy.powf(2.0)).sqrt();
+
+            match dist {
+                24.9..=25.1 => draw.rect().x_y(x as f32, y as f32).w_h(1.0, 1.0).color(BLACK),
+                24.0..=24.9 => draw.rect().x_y(x as f32, y as f32).w_h(1.0, 1.0).color(GRAY),
+                25.1..=25.5 => draw.rect().x_y(x as f32, y as f32).w_h(1.0, 1.0).color(GRAY),
+                _ => draw.rect().x_y(x as f32, y as f32).w_h(1.0, 1.0).color(WHITE),
+            };
+        }
     }
+    draw.to_frame(app, &frame).unwrap()
 }
